@@ -1,0 +1,19 @@
+# i18nlint
+
+> Find the user-facing strings AI code tools hardcode instead of translating.
+
+i18nlint is a zero-dependency CLI + MCP server (part of Otto, dev.ottospace.co) that scans
+React / Next / Vue / Svelte / HTML and reports every user-facing string that isn't translated
+yet — hardcoded JSX text, placeholder/alt/title attributes, un-localized dates & currency, and
+a missing `<html lang>`.
+
+## Use it
+- CLI: `npx github:moradothmanepro-OTTO/i18nlint .`
+- MCP: run `i18nlint-mcp` (tools: i18n_scan, i18n_check_code)
+- AI rules: `i18nlint --init-rules` writes I18N-RULES.md
+
+## Rules for agents
+Wrap every user-facing string in the project's t()/translation function; localize placeholder/
+alt/title/aria-label; use Intl.DateTimeFormat / Intl.NumberFormat with a locale; set <html lang>.
+
+Links: https://github.com/moradothmanepro-OTTO/i18nlint · https://dev.ottospace.co

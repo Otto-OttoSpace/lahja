@@ -1,0 +1,18 @@
+{
+  "name": "i18nlint",
+  "version": "0.1.0",
+  "description": "Find the user-facing strings AI code tools hardcode instead of translating. Part of Otto.",
+  "bin": {
+    "i18nlint": "bin/i18nlint.js",
+    "i18nlint-mcp": "mcp/i18nlint-mcp.js"
+  },
+  "type": "commonjs",
+  "keywords": ["i18n", "l10n", "localization", "translation", "hardcoded-strings", "intl", "ai", "cursor", "linter"],
+  "author": "Othmane Morad",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/moradothmanepro-OTTO/i18nlint.git" },
+  "homepage": "https://i18n.ottospace.co",
+  "engines": { "node": ">=16" },
+  "files": ["bin", "mcp", "README.md"],
+  "publishConfig": { "access": "public" }
+}

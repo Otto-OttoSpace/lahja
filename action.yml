@@ -1,0 +1,15 @@
+name: 'i18nlint'
+description: 'Find the user-facing strings AI code tools hardcode instead of translating'
+author: 'Othmane Morad'
+branding:
+  icon: 'globe'
+  color: 'yellow'
+inputs:
+  path:
+    description: 'File or directory to scan'
+    default: '.'
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: node "${{ github.action_path }}/bin/i18nlint.js" "${{ inputs.path }}"
