@@ -1,0 +1,7 @@
+[
+  {
+    "rule": "hardcoded-string",
+    "line": 3,
+    "from": "Public heading"
+  }
+]

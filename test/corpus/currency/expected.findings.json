@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "hardcoded-currency",
+    "line": 2,
+    "from": "$99"
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 2,
+    "from": "Total: $99 today"
+  }
+]

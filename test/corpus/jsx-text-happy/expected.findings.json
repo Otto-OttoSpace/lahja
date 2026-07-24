@@ -1,0 +1,22 @@
+[
+  {
+    "rule": "hardcoded-text",
+    "line": 4,
+    "from": "Your cart"
+  },
+  {
+    "rule": "hardcoded-attr",
+    "line": 5,
+    "from": "aria-label=\"Close cart\""
+  },
+  {
+    "rule": "hardcoded-attr",
+    "line": 5,
+    "from": "placeholder=\"Search items\""
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 5,
+    "from": "Checkout"
+  }
+]

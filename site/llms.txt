@@ -1,16 +1,19 @@
-# i18nlint
+# lahja
 
-> Find the user-facing strings AI code tools hardcode instead of translating.
+> Find the user-facing strings AI code tools hardcode instead of translating. Formerly i18nlint.
 
-i18nlint is a zero-dependency CLI + MCP server (part of Otto, dev.ottospace.co) that scans
-React / Next / Vue / Svelte / HTML and reports every user-facing string that isn't translated
-yet — hardcoded JSX text, placeholder/alt/title attributes, un-localized dates & currency, and
-a missing `<html lang>`.
+lahja is a CLI + MCP server (part of Otto, dev.ottospace.co) that scans React / Next / Vue /
+Svelte / Astro / HTML and reports every user-facing string that isn't translated yet — hardcoded
+JSX/markup text, hardcoded string literals (const label = '...', alert('...'), toast(`...`)),
+placeholder/alt/title/aria-label attributes, un-localized dates & currency, and a missing
+`<html lang>`. Detection is AST-verified (Babel), so live code and dynamic bindings are never
+mistaken for UI text.
 
 ## Use it
-- CLI: `npx github:moradothmanepro-OTTO/i18nlint .`
-- MCP: run `i18nlint-mcp` (tools: i18n_scan, i18n_check_code)
-- AI rules: `i18nlint --init-rules` writes I18N-RULES.md
+- CLI: `npx github:moradothmanepro-OTTO/i18nlint .` (binary: `lahja`, alias `i18nlint`)
+- MCP: run `lahja-mcp` (tools: lahja_scan, lahja_check_code)
+- AI rules: `lahja --init-rules` writes I18N-RULES.md
+- Legacy adoption: `lahja . --baseline` accepts current debt, fails only on NEW strings
 
 ## Rules for agents
 Wrap every user-facing string in the project's t()/translation function; localize placeholder/

@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>i18nlint — find the strings AI code tools forget to translate</title>
-<meta name="description" content="AI codegen hardcodes English text, un-localized dates and currency, and no html lang. i18nlint reports every user-facing string that isn't translated yet. Part of Otto.">
+<title>lahja — find the strings AI code tools forget to translate</title>
+<meta name="description" content="AI codegen hardcodes English text, un-localized dates and currency, and no html lang. lahja (formerly i18nlint) reports every user-facing string that isn't translated yet — AST-verified, so it never flags live code. Part of Otto.">
 <link rel="canonical" href="https://i18n.ottospace.co/">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"i18nlint","applicationCategory":"DeveloperApplication","operatingSystem":"Node.js","offers":{"@type":"Offer","price":"0"},"description":"Find the user-facing strings AI code tools hardcode instead of translating.","isPartOf":{"@type":"Organization","name":"Otto","url":"https://dev.ottospace.co"}}
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"lahja","alternateName":"i18nlint","applicationCategory":"DeveloperApplication","operatingSystem":"Node.js","offers":{"@type":"Offer","price":"0"},"description":"Find the user-facing strings AI code tools hardcode instead of translating. AST-verified.","isPartOf":{"@type":"Organization","name":"Otto","url":"https://dev.ottospace.co"}}
 </script>
 <style>
   :root{--bg:#0d1117;--panel:#161b22;--fg:#e6edf3;--mut:#8b949e;--amber:#d29922;--blue:#58a6ff;--line:#21262d}
@@ -33,10 +33,10 @@
 <body>
 <div class="wrap">
   <header>
-    <div class="logo">i18nlint</div>
+    <div class="logo">lahja · لهجة</div>
     <h1>AI baked English into your UI. Find every string it forgot to translate.</h1>
-    <p class="sub">AI codegen hardcodes text into JSX, formats dates and currency with no locale, and skips <code>&lt;html lang&gt;</code>. It looks done — until you ship in a second language. <b>i18nlint</b> reports every user-facing string that isn't translated yet.</p>
-    <div class="cmd"><span style="color:var(--mut)">$</span>&nbsp;npx <b>i18nlint</b> .</div>
+    <p class="sub">AI codegen hardcodes text into JSX, formats dates and currency with no locale, and skips <code>&lt;html lang&gt;</code>. It looks done — until you ship in a second language. <b>lahja</b> reports every user-facing string that isn't translated yet — <b>AST-verified</b>, so it never mistakes your live code for UI text.</p>
+    <div class="cmd"><span style="color:var(--mut)">$</span>&nbsp;npx <b>lahja</b> .</div>
     <div class="btns">
       <a class="btn p" href="https://github.com/moradothmanepro-OTTO/i18nlint">View on GitHub →</a>
       <a class="btn s" href="https://dev.ottospace.co">More Otto tools</a>
@@ -45,7 +45,8 @@
   <section>
     <h2>What it catches</h2>
     <ul>
-      <li><b>Hardcoded JSX text</b> — <code>&lt;h1&gt;Your cart&lt;/h1&gt;</code> → wrap in <code>t()</code></li>
+      <li><b>Hardcoded JSX / markup text</b> — <code>&lt;h1&gt;Your cart&lt;/h1&gt;</code> → wrap in <code>t()</code></li>
+      <li><b>Hardcoded string literals</b> — <code>const label = 'Add to cart'</code>, <code>alert('Saved')</code>, <code>toast(`…`)</code></li>
       <li><b>User-facing attributes</b> — placeholder, title, alt, aria-label, label</li>
       <li><b>Un-localized formatting</b> — a bare <code>toLocaleDateString()</code> with no locale</li>
       <li><b>Hardcoded currency</b> — <code>$99.00</code> → <code>Intl.NumberFormat</code></li>
@@ -53,11 +54,16 @@
     </ul>
   </section>
   <section>
+    <h2>Zero mistakes, by design</h2>
+    <p class="sub" style="text-align:left">Detection is <b>AST-verified</b> (Babel). A TS generic like <code>Array&lt;string&gt;</code> never welds across lines into "text"; <code>&lt;html&gt;</code> inside a string is never a missing-lang; a Vue <code>:placeholder="msg"</code> binding is never flagged; keys, ids, classNames and imports are left alone. Every one of those is a permanent test in <code>node --test</code>.</p>
+    <p class="sub" style="text-align:left;margin-top:10px">Adopting on a legacy repo? <code>npx lahja . --baseline</code> accepts today's debt and fails only on <b>new</b> strings. <code>--suggest</code> proposes a <code>t()</code>-wrap — and writes nothing.</p>
+  </section>
+  <section>
     <h2>In your AI agent (MCP)</h2>
-    <pre>{ "mcpServers": { "i18nlint": {
+    <pre>{ "mcpServers": { "lahja": {
   "command": "npx",
-  "args": ["-y","-p","github:moradothmanepro-OTTO/i18nlint","i18nlint-mcp"] } } }</pre>
-    <p class="sub" style="text-align:left;margin-top:14px">Tools: <code>i18n_scan</code>, <code>i18n_check_code</code> — so agents catch it as they write.</p>
+  "args": ["-y","-p","github:moradothmanepro-OTTO/i18nlint","lahja-mcp"] } } }</pre>
+    <p class="sub" style="text-align:left;margin-top:14px">Tools: <code>lahja_scan</code>, <code>lahja_check_code</code> — so agents catch it as they write.</p>
   </section>
   <footer>
     An <strong><a href="https://dev.ottospace.co">Otto</a></strong> tool · Arabic · Français · English · MIT

@@ -1,0 +1,7 @@
+[
+  {
+    "rule": "unlocalized-format",
+    "line": 2,
+    "from": ".toLocaleDateString()"
+  }
+]
