@@ -1,0 +1,22 @@
+[
+  {
+    "rule": "missing-html-lang",
+    "line": 2,
+    "from": "<html>"
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 3,
+    "from": "Store"
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 5,
+    "from": "Welcome"
+  },
+  {
+    "rule": "hardcoded-attr",
+    "line": 6,
+    "from": "placeholder=\"Search products\""
+  }
+]

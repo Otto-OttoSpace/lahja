@@ -1,5 +1,5 @@
-name: 'i18nlint'
-description: 'Find the user-facing strings AI code tools hardcode instead of translating'
+name: 'lahja'
+description: 'Find the user-facing strings AI code tools hardcode instead of translating (AST-verified)'
 author: 'Othmane Morad'
 branding:
   icon: 'globe'
@@ -8,8 +8,11 @@ inputs:
   path:
     description: 'File or directory to scan'
     default: '.'
+  baseline:
+    description: 'Use .lahja-baseline.json — fail only on strings added since the snapshot'
+    default: 'false'
 runs:
   using: 'composite'
   steps:
     - shell: bash
-      run: node "${{ github.action_path }}/bin/i18nlint.js" "${{ inputs.path }}"
+      run: node "${{ github.action_path }}/bin/lahja.js" "${{ inputs.path }}" ${{ inputs.baseline == 'true' && '--baseline' || '' }}

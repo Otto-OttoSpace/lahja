@@ -1,0 +1,17 @@
+[
+  {
+    "rule": "hardcoded-string",
+    "line": 3,
+    "from": "Edit profile"
+  },
+  {
+    "rule": "hardcoded-attr",
+    "line": 5,
+    "from": "placeholder=\"Your name\""
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 7,
+    "from": "Profile"
+  }
+]

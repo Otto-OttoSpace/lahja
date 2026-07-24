@@ -1,0 +1,22 @@
+[
+  {
+    "rule": "hardcoded-attr",
+    "line": 4,
+    "from": "placeholder=\"Search\""
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 5,
+    "from": "Full name"
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 6,
+    "from": "Save"
+  },
+  {
+    "rule": "hardcoded-string",
+    "line": 11,
+    "from": "Account settings"
+  }
+]

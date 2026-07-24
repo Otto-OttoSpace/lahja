@@ -7,4 +7,4 @@ Any agent writing UI in this repo must:
 4. **Never hardcode currency** — use `Intl.NumberFormat(locale, { style: 'currency', currency })`.
 5. **Set `<html lang>`** (and `dir`) from the active locale.
 
-Run `npx i18nlint .` before finishing — it must report zero untranslated strings.
+Run `npx lahja .` before finishing — it must report zero untranslated strings.

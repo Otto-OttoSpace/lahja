@@ -1,0 +1,22 @@
+[
+  {
+    "rule": "hardcoded-string",
+    "line": 2,
+    "from": "Add to cart"
+  },
+  {
+    "rule": "hardcoded-string",
+    "line": 3,
+    "from": "Saved"
+  },
+  {
+    "rule": "hardcoded-string",
+    "line": 4,
+    "from": "Order confirmed"
+  },
+  {
+    "rule": "hardcoded-string",
+    "line": 5,
+    "from": "Welcome back"
+  }
+]
