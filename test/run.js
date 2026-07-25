@@ -80,3 +80,32 @@ test('bug#6: currency "$99" is reported whole, once', () => {
   assert.strictEqual(cur.length, 1);
   assert.strictEqual(cur[0].from, '$99', 'must be "$99", not the partial "$9"');
 });
+
+// -- all-scripts propagation + segmentation smell -------------------------------
+test('all-scripts: single-token non-Latin UI text (CJK/Thai/Arabic) is flagged', () => {
+  const f = scanFindings(path.join(CORPUS, 'nonlatin-message', 'input.ts'));
+  for (const s of ['保存', 'บันทึกแล้ว', 'احفظ'])
+    assert.ok(f.some(x => x.rule === 'hardcoded-string' && x.from === s),
+      `${s} is real UI text — the Latin-only single-token gate used to miss it`);
+});
+
+test('segmentation: Thai .split(" ") is flagged (spaceless script needs a segmenter)', () => {
+  const f = scanFindings(path.join(CORPUS, 'seg-thai-split', 'input.ts'));
+  assert.ok(f.some(x => x.rule === 'segmentation-smell' && x.from === ".split(' ')"),
+    'split(" ") never finds a word boundary in Thai');
+});
+
+test('segmentation: CJK .length / .slice truncation is flagged', () => {
+  const f = scanFindings(path.join(CORPUS, 'seg-cjk', 'input.ts'));
+  assert.ok(f.some(x => x.rule === 'segmentation-smell' && x.from === '.length'),
+    '.length counts UTF-16 code units, not graphemes');
+  assert.ok(f.some(x => x.rule === 'segmentation-smell' && x.from === '.slice()'),
+    '.slice() cuts through a CJK grapheme');
+});
+
+test('segmentation: word-break:break-all is flagged, but NOT when only named in a comment', () => {
+  const f = scanFindings(path.join(CORPUS, 'seg-wordbreak', 'input.tsx'));
+  const wb = f.filter(x => x.rule === 'segmentation-smell' && x.from === 'word-break: break-all');
+  assert.strictEqual(wb.length, 1, 'flag the real declaration once; the comment naming it must not count');
+  assert.strictEqual(wb[0].line, 3);
+});
