@@ -1,0 +1,7 @@
+[
+  {
+    "rule": "segmentation-smell",
+    "line": 4,
+    "from": ".split(' ')"
+  }
+]

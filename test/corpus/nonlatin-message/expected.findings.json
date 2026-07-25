@@ -1,0 +1,17 @@
+[
+  {
+    "rule": "hardcoded-string",
+    "line": 4,
+    "from": "保存"
+  },
+  {
+    "rule": "hardcoded-string",
+    "line": 5,
+    "from": "บันทึกแล้ว"
+  },
+  {
+    "rule": "hardcoded-string",
+    "line": 6,
+    "from": "احفظ"
+  }
+]

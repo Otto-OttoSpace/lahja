@@ -1,0 +1,17 @@
+[
+  {
+    "rule": "segmentation-smell",
+    "line": 4,
+    "from": ".length"
+  },
+  {
+    "rule": "segmentation-smell",
+    "line": 5,
+    "from": ".slice()"
+  },
+  {
+    "rule": "segmentation-smell",
+    "line": 6,
+    "from": ".slice()"
+  }
+]

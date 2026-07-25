@@ -1,0 +1,7 @@
+[
+  {
+    "rule": "segmentation-smell",
+    "line": 3,
+    "from": "word-break: break-all"
+  }
+]
