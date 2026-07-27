@@ -12,16 +12,47 @@
   "scripts": {
     "test": "node --test test/run.js"
   },
-  "keywords": ["lahja", "i18nlint", "i18n", "l10n", "localization", "translation", "hardcoded-strings", "intl", "ast", "ai", "cursor", "claude", "linter"],
+  "keywords": [
+    "lahja",
+    "i18nlint",
+    "i18n",
+    "l10n",
+    "localization",
+    "translation",
+    "hardcoded-strings",
+    "intl",
+    "ast",
+    "ai",
+    "cursor",
+    "claude",
+    "linter"
+  ],
   "author": "Othmane Morad",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/moradothmanepro-OTTO/i18nlint.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moradothmanepro-OTTO/i18nlint.git"
+  },
   "homepage": "https://i18n.ottospace.co",
-  "engines": { "node": ">=18" },
-  "files": ["bin", "lib", "mcp", "action.yml", "README.md"],
-  "publishConfig": { "access": "public" },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "mcp",
+    "action.yml",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@babel/parser": "^8.0.4",
     "@babel/traverse": "^8.0.4"
+  },
+  "funding": {
+    "type": "polar",
+    "url": "https://polar.sh/otto-space"
   }
 }
