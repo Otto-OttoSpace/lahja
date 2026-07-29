@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "hardcoded-string",
+    "line": 2,
+    "from": "التاريخ اليوم"
+  },
+  {
+    "rule": "unlocalized-format",
+    "line": 3,
+    "from": ".toLocaleDateString()"
+  }
+]

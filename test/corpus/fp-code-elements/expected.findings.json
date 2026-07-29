@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "hardcoded-string",
+    "line": 2,
+    "from": "مرحبا بمتجرنا"
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 5,
+    "from": "Install it now"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "hardcoded-string",
+    "line": 2,
+    "from": "اسم المنتج طويل جدا"
+  },
+  {
+    "rule": "segmentation-smell",
+    "line": 7,
+    "from": ".length"
+  }
+]

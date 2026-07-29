@@ -109,3 +109,88 @@ test('segmentation: word-break:break-all is flagged, but NOT when only named in 
   assert.strictEqual(wb.length, 1, 'flag the real declaration once; the comment naming it must not count');
   assert.strictEqual(wb[0].line, 3);
 });
+
+// -- severity model + hardening false-positive fixes (L1–L5) --------------------
+// These read the FULL JSON (with `severity`), which the rule/line/from corpus
+// loop above intentionally strips. Each fix proves BOTH halves: the reproduced
+// false positive is now 0 / advice AND a genuine hardcoded UI string (usually a
+// real Arabic-facing phrase) is still caught as a `warning`.
+function scanFull(file) {
+  const out = JSON.parse(runCli([file, '--json']) || '{}');
+  return { summary: out.summary || {}, results: out.results || [] };
+}
+const CASE = name =>
+  path.join(CORPUS, name, fs.readdirSync(path.join(CORPUS, name)).find(f => f.startsWith('input.')));
+
+test('severity: every finding carries a severity and the summary tallies them', () => {
+  const { summary, results } = scanFull(CASE('fp-brand-proper-noun'));
+  assert.ok(results.length > 0);
+  assert.ok(results.every(r => ['error', 'warning', 'advice'].includes(r.severity)),
+    'each finding must carry error|warning|advice');
+  const tally = { error: 0, warning: 0, advice: 0 };
+  for (const r of results) tally[r.severity]++;
+  assert.strictEqual(summary.error, tally.error);
+  assert.strictEqual(summary.warning, tally.warning);
+  assert.strictEqual(summary.advice, tally.advice);
+  assert.strictEqual(summary.total, results.length);
+});
+
+test('L1: <code>/<pre>/<kbd>/<samp> content is NOT flagged; sibling UI text still warns', () => {
+  const { results } = scanFull(CASE('fp-code-elements'));
+  assert.ok(!results.some(r => /npm install|const x|Cmd Shift|not found/.test(r.from)),
+    'code / shell / shortcut / sample output is not translatable');
+  assert.ok(results.some(r => r.from === 'Install it now' && r.severity === 'warning'),
+    'a genuine UI string is still a warning');
+  assert.ok(results.some(r => r.from === 'مرحبا بمتجرنا' && r.severity === 'warning'),
+    'a genuine Arabic-facing UI string is still a warning');
+});
+
+test('L2: a bare toLocale*() is advice (ok client-side), not a defect', () => {
+  const { results } = scanFull(CASE('fp-tolocale-advice'));
+  const tl = results.find(r => r.rule === 'unlocalized-format');
+  assert.ok(tl && tl.severity === 'advice', 'no-arg toLocale* uses the host locale → advice');
+  assert.ok(results.some(r => r.rule === 'hardcoded-string' && r.severity === 'warning'),
+    'a genuine Arabic-facing UI string is still a warning');
+});
+
+test('L3: boolean/comparison .length is NOT flagged; a displayed count is advice', () => {
+  const { results } = scanFull(CASE('fp-length-boolean'));
+  const lens = results.filter(r => r.rule === 'segmentation-smell' && r.from === '.length');
+  assert.strictEqual(lens.length, 1, 'only the displayed .length counts; if()/>0/===0 are emptiness checks');
+  assert.strictEqual(lens[0].line, 7);
+  assert.strictEqual(lens[0].severity, 'advice');
+  assert.ok(results.some(r => r.rule === 'hardcoded-string' && r.severity === 'warning'),
+    'a genuine Arabic-facing UI string is still a warning');
+});
+
+test('L4: a capitalized <Html> is NOT missing-html-lang; lowercase <html> still is', () => {
+  const { results } = scanFull(CASE('fp-html-component'));
+  assert.ok(!results.some(r => r.rule === 'missing-html-lang'),
+    'a Next/styled <Html> component renders its own root — never flag it');
+  assert.ok(results.some(r => r.from === 'حمل التطبيق الآن' && r.severity === 'warning'),
+    'a genuine Arabic-facing UI string is still a warning');
+  const html = scanFull(CASE('html-lang'));
+  assert.ok(html.results.some(r => r.rule === 'missing-html-lang'),
+    'the lowercase intrinsic <html> without lang still fires');
+});
+
+test('L5: a brand token is dropped, a lone proper noun is advice, a real phrase warns', () => {
+  const { results } = scanFull(CASE('fp-brand-proper-noun'));
+  assert.ok(!results.some(r => /Stripe|GitHub/.test(r.from)), 'brand names are not translatable copy');
+  assert.ok(results.some(r => r.from === 'Morocco' && r.severity === 'advice'),
+    'a lone Title-case proper noun is low-confidence → advice');
+  assert.ok(results.some(r => r.from === 'سياسة الخصوصية' && r.severity === 'warning'),
+    'a genuine Arabic-facing UI phrase is still a warning');
+});
+
+test('exit codes: default/--check gate on error (0); --strict fails on warnings; --report-only never fails', () => {
+  const input = CASE('fp-brand-proper-noun'); // has warnings, zero errors
+  const run = (extra) => {
+    try { execFileSync(process.execPath, [CLI, input, ...extra], { encoding: 'utf8' }); return 0; }
+    catch (e) { return e.status; }
+  };
+  assert.strictEqual(run([]), 0, 'default: no error → exit 0');
+  assert.strictEqual(run(['--check']), 0, '--check gates on error → exit 0');
+  assert.strictEqual(run(['--strict']), 1, '--strict also fails on warnings → exit 1');
+  assert.strictEqual(run(['--report-only', '--strict']), 0, '--report-only always exits 0');
+});
