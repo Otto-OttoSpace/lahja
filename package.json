@@ -31,9 +31,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/moradothmanepro-OTTO/i18nlint.git"
+    "url": "git+https://github.com/Otto-OttoSpace/lahja.git"
   },
-  "homepage": "https://i18n.ottospace.co",
+  "homepage": "https://github.com/Otto-OttoSpace/lahja#readme",
   "engines": {
     "node": ">=18"
   },
@@ -52,7 +52,10 @@
     "@babel/traverse": "^8.0.4"
   },
   "funding": {
-    "type": "polar",
-    "url": "https://polar.sh/otto-space"
+    "type": "github",
+    "url": "https://github.com/sponsors/Otto-OttoSpace"
+  },
+  "bugs": {
+    "url": "https://github.com/Otto-OttoSpace/lahja/issues"
   }
 }
