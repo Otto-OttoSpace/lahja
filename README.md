@@ -11,12 +11,23 @@ It is **AST-verified** (Babel for JS/TS/JSX/TSX): only real syntax nodes count, 
 
 ```bash
 npx lahja .                 # report untranslated strings
-npx lahja . --json          # machine-readable (CI)
-npx lahja . --check         # exit non-zero on any finding (CI)
+npx lahja . --json          # machine-readable + severity summary (CI)
+npx lahja . --check         # CI gate on errors only (lahja emits none → passes)
+npx lahja . --strict        # fail on warnings too (the usual CI gate for lahja)
+npx lahja . --report-only   # always exit 0 (report, never gate)
 npx lahja . --baseline      # accept today's debt, then fail only on NEW strings
 npx lahja . --suggest       # PROPOSE a t()-wrap for each finding (writes nothing)
 npx lahja . --init-rules    # write I18N-RULES.md for your AI agent
 ```
+
+## Severity — so it never hard-fails a client build by surprise
+Every finding is **`error` | `warning` | `advice`** (JSON adds `severity` per finding plus a
+`summary`). i18n detection is inference over source, not a proven defect, so lahja emits **no
+`error`s**: hardcoded UI text is a **warning** (context-inferred); a bare `toLocaleString()`, a
+segmentation smell, and a lone brand/proper-noun token (`Stripe`, `Morocco`) are **advice**.
+Exit is non-zero **only** on an `error`, so a plain run or `--check` never fails a build — gate
+CI with **`--strict`** (fails on warnings). Known brand names are skipped; `<code>`/`<pre>`/`<kbd>`
+content, `<Html>` components, and `if (x.length)` emptiness checks are never flagged.
 
 ## What it catches
 - **Hardcoded JSX / markup text** — `<h1>Your cart</h1>` → wrap in `t()`

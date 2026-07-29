@@ -1,0 +1,17 @@
+[
+  {
+    "rule": "hardcoded-string",
+    "line": 4,
+    "from": "ادفع بأمان عبر بطاقتك"
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 8,
+    "from": "Morocco"
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 9,
+    "from": "سياسة الخصوصية"
+  }
+]
