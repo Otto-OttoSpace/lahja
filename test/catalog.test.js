@@ -59,6 +59,26 @@ test('catalog: --base overrides the base locale', () => {
   } finally { fs.rmSync(d, { recursive: true, force: true }); }
 });
 
+test('catalog: html-entity-in-value flags &amp;/&#233;/&nbsp;; a lone "&" (Rock & Roll) is safe', () => {
+  const d = setup({
+    'en.json': { terms: 'Terms and conditions', cafe: 'Cafe', spaced: 'Buy now', band: 'Rock and Roll' },
+    'fr.json': {
+      terms: 'Conditions &amp; usage',   // raw named entity — MT artifact
+      cafe: 'Caf&#233;',                  // raw numeric entity
+      spaced: 'Achetez&nbsp;maintenant',  // raw &nbsp;
+      band: 'Rock & Roll',                // legitimate lone ampersand — must NOT flag
+    },
+  });
+  try {
+    const res = runJson(d);
+    const fr = res.results.find(x => x.locale === 'fr');
+    const ent = fr.findings.filter(f => f.rule === 'html-entity-in-value');
+    const keys = new Set(ent.map(f => f.key));
+    for (const k of ['terms', 'cafe', 'spaced']) assert.ok(keys.has(k), `${k} should flag html-entity-in-value`);
+    assert.ok(!keys.has('band'), 'a legitimate lone "&" must not be flagged');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
 test('catalog: ignores non-locale JSON (package.json etc.)', () => {
   const d = setup({ 'en.json': { a: 'A' }, 'ar.json': { a: 'ا' }, 'package.json': { name: 'x' } });
   try {
