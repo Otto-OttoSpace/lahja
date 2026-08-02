@@ -10,7 +10,7 @@ placeholder/alt/title/aria-label attributes, un-localized dates & currency, and 
 mistaken for UI text.
 
 ## Use it
-- CLI: `npx github:moradothmanepro-OTTO/i18nlint .` (binary: `lahja`, alias `i18nlint`)
+- CLI: `npx github:Otto-OttoSpace/lahja .` (binary: `lahja`, alias `i18nlint`)
 - MCP: run `lahja-mcp` (tools: lahja_scan, lahja_check_code)
 - AI rules: `lahja --init-rules` writes I18N-RULES.md
 - Legacy adoption: `lahja . --baseline` accepts current debt, fails only on NEW strings
@@ -19,4 +19,4 @@ mistaken for UI text.
 Wrap every user-facing string in the project's t()/translation function; localize placeholder/
 alt/title/aria-label; use Intl.DateTimeFormat / Intl.NumberFormat with a locale; set <html lang>.
 
-Links: https://github.com/moradothmanepro-OTTO/i18nlint · https://dev.ottospace.co
+Links: https://github.com/Otto-OttoSpace/lahja · https://dev.ottospace.co
