@@ -53,7 +53,7 @@ Translating is a human decision — which key, which message, which namespace. l
 
 ## In your AI agent (MCP)
 ```json
-{ "mcpServers": { "lahja": { "command": "npx", "args": ["-y", "-p", "github:moradothmanepro-OTTO/i18nlint", "lahja-mcp"] } } }
+{ "mcpServers": { "lahja": { "command": "npx", "args": ["-y", "-p", "github:Otto-OttoSpace/lahja", "lahja-mcp"] } } }
 ```
 Tools: `lahja_scan`, `lahja_check_code`.
 
