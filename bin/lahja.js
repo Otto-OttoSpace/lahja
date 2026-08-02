@@ -83,6 +83,9 @@ Usage:
   npx lahja [path] --update-baseline   (re)write the baseline from current findings
   npx lahja [path] --suggest    PROPOSE a t()-wrap for each finding (writes nothing)
   npx lahja [path] --init-rules write I18N-RULES.md for your AI agent
+  npx lahja <dir> --catalog     validate locale JSON catalogs across locales:
+                                missing/empty keys, placeholder drift, ICU-plural
+                                completeness (CLDR) — the Arabic-critical check. [--base <locale>]
   npx lahja --help | --version
 
 Severity: every finding is error | warning | advice. Exit is non-zero ONLY on an
@@ -110,7 +113,29 @@ function main() {
   const useBaseline = args.includes('--baseline');
   const updateBaseline = args.includes('--update-baseline');
   const initRules = args.includes('--init-rules');
-  const target = args.find(a => !a.startsWith('-')) || '.';
+  const doCatalog = args.includes('--catalog');
+  const baseIdx = args.indexOf('--base');
+  const baseLocale = baseIdx !== -1 ? args[baseIdx + 1] : null;
+  const target = args.find((a, i) => !a.startsWith('-') && (baseIdx === -1 || i !== baseIdx + 1)) || '.';
+
+  if (doCatalog) {
+    const { checkCatalog } = require('../lib/catalog-core');
+    const res = checkCatalog(target, { base: baseLocale });
+    if (res.error) { console.error(`lahja --catalog: ${res.error}`); process.exit(2); }
+    if (asJson) {
+      console.log(JSON.stringify(res, null, 2));
+    } else {
+      console.log(`i18n catalog — base locale: ${res.base}`);
+      for (const r of res.results) {
+        if (!r.findings.length) { console.log(`  ✓ ${r.locale}`); continue; }
+        console.log(`  ${r.locale}  (${r.findings.length}):`);
+        for (const f of r.findings) console.log(`    ${f.rule.padEnd(22)} ${f.key}${f.msg ? '  — ' + f.msg : ''}`);
+      }
+      const total = res.results.reduce((n, r) => n + r.findings.length, 0);
+      console.log(total ? `\n${total} issue(s) across ${res.results.length} locale(s).` : `\nAll locales complete against ${res.base}. ✓`);
+    }
+    process.exit(res.results.reduce((n, r) => n + r.findings.length, 0) ? 1 : 0);
+  }
 
   if (initRules) {
     const dest = path.join(target, 'I18N-RULES.md');
