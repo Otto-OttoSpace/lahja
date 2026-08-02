@@ -1,73 +1,46 @@
-<!doctype html>
-<html lang="en" dir="ltr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>lahja — find the strings AI code tools forget to translate</title>
-<meta name="description" content="AI codegen hardcodes English text, un-localized dates and currency, and no html lang. lahja (formerly i18nlint) reports every user-facing string that isn't translated yet — AST-verified, so it never flags live code. Part of Otto.">
-<link rel="canonical" href="https://i18n.ottospace.co/">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"lahja","alternateName":"i18nlint","applicationCategory":"DeveloperApplication","operatingSystem":"Node.js","offers":{"@type":"Offer","price":"0"},"description":"Find the user-facing strings AI code tools hardcode instead of translating. AST-verified.","isPartOf":{"@type":"Organization","name":"Otto","url":"https://dev.ottospace.co"}}
-</script>
-<style>
-  :root{--bg:#0d1117;--panel:#161b22;--fg:#e6edf3;--mut:#8b949e;--amber:#d29922;--blue:#58a6ff;--line:#21262d}
-  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-  .wrap{max-width:820px;margin:0 auto;padding:0 22px}
-  header{padding:76px 0 40px;text-align:center}
-  .logo{font-weight:700;font-size:15px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
-  h1{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:16px 0 14px;font-weight:800}
-  .sub{font-size:19px;color:var(--mut);max-width:620px;margin:0 auto 26px}
-  .cmd{display:inline-flex;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
-  .cmd b{color:var(--amber)}
-  .btns{margin-top:22px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .btn{display:inline-block;padding:11px 20px;border-radius:10px;text-decoration:none;font-weight:600}
-  .btn.p{background:var(--blue);color:#08131f}.btn.s{border:1px solid var(--line);color:var(--fg)}
-  section{padding:34px 0;border-top:1px solid var(--line)}h2{font-size:23px;margin:0 0 14px}
-  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:14px;margin:0}
-  ul{color:var(--mut)}ul b{color:var(--fg)}
-  footer{padding:40px 0 68px;color:var(--mut);text-align:center;border-top:1px solid var(--line);font-size:14px}
-  a{color:var(--blue)}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <div class="logo">lahja · لهجة</div>
-    <h1>AI baked English into your UI. Find every string it forgot to translate.</h1>
-    <p class="sub">AI codegen hardcodes text into JSX, formats dates and currency with no locale, and skips <code>&lt;html lang&gt;</code>. It looks done — until you ship in a second language. <b>lahja</b> reports every user-facing string that isn't translated yet — <b>AST-verified</b>, so it never mistakes your live code for UI text.</p>
-    <div class="cmd"><span style="color:var(--mut)">$</span>&nbsp;npx <b>lahja</b> .</div>
-    <div class="btns">
-      <a class="btn p" href="https://github.com/moradothmanepro-OTTO/i18nlint">View on GitHub →</a>
-      <a class="btn s" href="https://dev.ottospace.co">More Otto tools</a>
-    </div>
-  </header>
-  <section>
-    <h2>What it catches</h2>
-    <ul>
-      <li><b>Hardcoded JSX / markup text</b> — <code>&lt;h1&gt;Your cart&lt;/h1&gt;</code> → wrap in <code>t()</code></li>
-      <li><b>Hardcoded string literals</b> — <code>const label = 'Add to cart'</code>, <code>alert('Saved')</code>, <code>toast(`…`)</code></li>
-      <li><b>User-facing attributes</b> — placeholder, title, alt, aria-label, label</li>
-      <li><b>Un-localized formatting</b> — a bare <code>toLocaleDateString()</code> with no locale</li>
-      <li><b>Hardcoded currency</b> — <code>$99.00</code> → <code>Intl.NumberFormat</code></li>
-      <li><b>Missing <code>&lt;html lang&gt;</code></b></li>
-    </ul>
-  </section>
-  <section>
-    <h2>Zero mistakes, by design</h2>
-    <p class="sub" style="text-align:left">Detection is <b>AST-verified</b> (Babel). A TS generic like <code>Array&lt;string&gt;</code> never welds across lines into "text"; <code>&lt;html&gt;</code> inside a string is never a missing-lang; a Vue <code>:placeholder="msg"</code> binding is never flagged; keys, ids, classNames and imports are left alone. Every one of those is a permanent test in <code>node --test</code>.</p>
-    <p class="sub" style="text-align:left;margin-top:10px">Adopting on a legacy repo? <code>npx lahja . --baseline</code> accepts today's debt and fails only on <b>new</b> strings. <code>--suggest</code> proposes a <code>t()</code>-wrap — and writes nothing.</p>
-  </section>
-  <section>
-    <h2>In your AI agent (MCP)</h2>
-    <pre>{ "mcpServers": { "lahja": {
-  "command": "npx",
-  "args": ["-y","-p","github:moradothmanepro-OTTO/i18nlint","lahja-mcp"] } } }</pre>
-    <p class="sub" style="text-align:left;margin-top:14px">Tools: <code>lahja_scan</code>, <code>lahja_check_code</code> — so agents catch it as they write.</p>
-  </section>
-  <footer>
-    An <strong><a href="https://dev.ottospace.co">Otto</a></strong> tool · Arabic · Français · English · MIT
-  </footer>
-</div>
-</body>
-</html>
+<!doctype html><html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lahja — every string, every language</title><meta name="description" content="Every string, every language."><link rel="canonical" href="https://lahja.ottospace.co/"><link rel="alternate" hreflang="en" href="https://lahja.ottospace.co/"><link rel="alternate" hreflang="ar" href="https://lahja.ottospace.co/ar/"><link rel="alternate" hreflang="fr" href="https://lahja.ottospace.co/fr/"><link rel="alternate" hreflang="es" href="https://lahja.ottospace.co/es/"><link rel="alternate" hreflang="pt" href="https://lahja.ottospace.co/pt/"><link rel="alternate" hreflang="de" href="https://lahja.ottospace.co/de/"><link rel="alternate" hreflang="it" href="https://lahja.ottospace.co/it/"><link rel="alternate" hreflang="tr" href="https://lahja.ottospace.co/tr/"><link rel="alternate" hreflang="ru" href="https://lahja.ottospace.co/ru/"><link rel="alternate" hreflang="fa" href="https://lahja.ottospace.co/fa/"><link rel="alternate" hreflang="ur" href="https://lahja.ottospace.co/ur/"><link rel="alternate" hreflang="hi" href="https://lahja.ottospace.co/hi/"><link rel="alternate" hreflang="zh" href="https://lahja.ottospace.co/zh/"><link rel="alternate" hreflang="ja" href="https://lahja.ottospace.co/ja/"><link rel="alternate" hreflang="x-default" href="https://lahja.ottospace.co/"><meta property="og:title" content="Lahja — every string, every language"><meta property="og:description" content="Every string, every language."><meta property="og:type" content="website"><meta property="og:url" content="https://lahja.ottospace.co/"><meta property="og:image" content="https://ottospace.co/assets/otto-mark.png"><meta name="twitter:card" content="summary_large_image"><meta name="robots" content="index,follow">
+<link rel="icon" href="https://ottospace.co/assets/otto-mark.png" type="image/png">
+<link rel="stylesheet" href="https://ottospace.co/assets/tokens.css"><link rel="stylesheet" href="https://ottospace.co/assets/site.css"><link rel="stylesheet" href="https://ottospace.co/assets/token-alias.css">
+<style>.rv{opacity:1 !important;transform:none !important}.hero-home{padding-top:96px}.langpanel{max-height:min(60vh,420px);overflow-y:auto}</style>
+</head><body>
+<div class="grain" aria-hidden="true"></div><div class="glow" id="glow" aria-hidden="true"></div>
+<nav class="top"><div class="bar">
+  <a class="brand" href="https://ottospace.co"><img src="https://ottospace.co/assets/otto-mark.png" alt="OttoSpace">OttoSpace</a>
+  <div class="navr"><div class="navlinks"><a href="https://ottospace.co/products/">Products</a><a href="https://dev.ottospace.co">Tools</a><a href="https://community.ottospace.co">Community</a><a href="https://ottospace.co/#do">Studio</a></div>
+  <span class="clock" id="clock" data-label="Montréal">Montréal —:—</span><div class="langmenu" data-cur="en"><button class="langbtn" aria-haspopup="true" aria-expanded="false" aria-label="Choose language"><span class="globe" aria-hidden="true">◍</span><span class="lc">English</span><span class="cv" aria-hidden="true">▾</span></button><div class="langpanel" role="menu"><a href="#" hreflang="en" lang="en" aria-current="true">English</a><a href="/ar/" hreflang="ar" lang="ar" dir="rtl">العربية</a><a href="/fr/" hreflang="fr" lang="fr">Français</a><a href="/es/" hreflang="es" lang="es">Español</a><a href="/pt/" hreflang="pt" lang="pt">Português</a><a href="/de/" hreflang="de" lang="de">Deutsch</a><a href="/it/" hreflang="it" lang="it">Italiano</a><a href="/tr/" hreflang="tr" lang="tr">Türkçe</a><a href="/ru/" hreflang="ru" lang="ru">Русский</a><a href="/fa/" hreflang="fa" lang="fa" dir="rtl">فارسی</a><a href="/ur/" hreflang="ur" lang="ur" dir="rtl">اردو</a><a href="/hi/" hreflang="hi" lang="hi">हिन्दी</a><a href="/zh/" hreflang="zh" lang="zh">中文</a><a href="/ja/" hreflang="ja" lang="ja">日本語</a></div></div>
+  <a class="cta magnetic" href="https://id.ottospace.co">Sign in</a>
+  </div></div></nav>
+<header class="hero-home"><div class="aurora" aria-hidden="true"></div><div class="wrap">
+  <div class="eyebrow rv">لهجة · Otto</div>
+  <h1 class="hh rv" data-d="1">Every string, every language.</h1>
+  <p class="hlede rv" data-d="2">Lahja catches the user-facing strings your code (and your AI) forgot to translate — in every script — plus the naive text-splitting that breaks non-space languages like Thai and CJK.</p>
+  <div class="rv" data-d="3" style="margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+    <a class="btn solid" href="https://github.com/Otto-OttoSpace/lahja">GitHub <span class="ar">↗</span></a>
+    <code style="font-family:var(--mono);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:13px">npx github:Otto-OttoSpace/lahja</code>
+  </div>
+</div></header>
+<section class="divide"><div class="wrap">
+  <div class="kh rv"><span class="ix">01</span> What it does</div>
+  <div class="cards" data-anim="rise-group" style="margin-top:28px"><a class="card rv" data-d="1"><h4>AST-accurate</h4><p>Real parsing, not regex — no false positives on code, no missed literals.</p></a><a class="card rv" data-d="2"><h4>Every script</h4><p>Catches single-token CJK / Thai / Arabic UI strings a Latin-only linter drops.</p></a><a class="card rv" data-d="3"><h4>Segmentation smell</h4><p>Flags naive space-splitting on no-space scripts and recommends Intl.Segmenter.</p></a><a class="card rv" data-d="4"><h4>Baseline mode</h4><p>Adopt on an existing repo: accept today's debt, fail only on new strings.</p></a></div>
+</div></section>
+<section class="divide"><div class="wrap">
+  <div class="kh rv"><span class="ix">02</span> Part of Miraat Labs — open tools for the multilingual web</div>
+  <div class="rv" style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap"><a class="chip" href="https://miraat.ottospace.co/">Miraat <span>· RTL linter</span></a><a class="chip" href="https://kashida.ottospace.co/">Kashida <span>· Arabic type</span></a><a class="chip" href="https://daleel.ottospace.co/">Daleel <span>· DGA gate</span></a><a class="chip" href="https://mizan.ottospace.co/">Mizan <span>· RTL benchmark</span></a></div>
+</div></section>
+<footer><div class="wrap"><div class="foot-top">
+  <div class="foot-brand"><a class="brand" href="https://ottospace.co/"><img src="https://ottospace.co/assets/otto-mark.png" alt="" style="width:24px;height:24px">OttoSpace</a>
+    <p>Independent design-and-engineering studio. Products, tools & brands — under one roof, in every language, for teams worldwide.</p></div>
+  <div class="foot-cols">
+    <div class="fcol"><h5>Apps</h5><a href="https://id.ottospace.co/">OttoID</a><a href="https://auth.ottospace.co/">OttoAuth</a><a href="https://ticket.ottospace.co/">OttoTicket</a><a href="https://book.ottospace.co/">OttoBook</a><a href="https://pay.ottospace.co/">OttoPay</a></div>
+    <div class="fcol"><h5>Tools</h5><a href="https://miraat.ottospace.co/">Miraat</a><a href="https://kashida.ottospace.co/">Kashida</a><a href="https://lahja.ottospace.co/">Lahja</a><a href="https://daleel.ottospace.co/">Daleel</a><a href="https://mizan.ottospace.co/">Mizan</a></div>
+    <div class="fcol"><h5>Studio</h5><a href="https://ottospace.co/work/">Work</a><a href="https://ottospace.co/#do">Approach</a><a href="https://dev.ottospace.co">Tools</a><a href="https://community.ottospace.co">Community</a></div>
+    <div class="fcol"><h5>Company</h5><a href="https://ottospace.co/privacy/">Privacy</a><a href="https://ottospace.co/terms/">Terms</a><a href="https://ottospace.co/accessibility/">Accessibility</a></div>
+  </div></div></div>
+  <div class="foot-word" aria-hidden="true">OTTOSPACE</div>
+  <div class="wrap"><div class="foot-bottom"><span>© 2026 OttoSpace · MIT</span><span>Designed & engineered in-house · 14 languages</span></div></div>
+</footer>
+<script src="https://ottospace.co/assets/site.js" defer></script>
+<script src="https://ottospace.co/assets/concierge.js" defer></script>
+</body></html>
