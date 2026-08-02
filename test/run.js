@@ -183,6 +183,31 @@ test('L5: a brand token is dropped, a lone proper noun is advice, a real phrase 
     'a genuine Arabic-facing UI phrase is still a warning');
 });
 
+test('currency: Gulf/MENA ISO codes (KWD/QAR/BHD/OMR/EGP) are flagged; lowercase word "try" is NOT', () => {
+  const os = require('node:os');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'lahja-cur-'));
+  const file = path.join(dir, 'input.tsx');
+  fs.writeFileSync(file,
+    'export function P() {\n' +
+    '  return <div>\n' +
+    '    <span>Total: 250 KWD</span>\n' +
+    '    <span>Deposit: 50 QAR</span>\n' +
+    '    <span>Fee: 10 BHD</span>\n' +
+    '    <span>Balance: 30 OMR</span>\n' +
+    '    <span>Price: 199 EGP</span>\n' +
+    // FP-safety: the English verb "try" after a digit (lowercase) is NOT the TRY lira
+    '    <span>You have 3 try again later</span>\n' +
+    '  </div>;\n' +
+    '}\n');
+  try {
+    const f = scanFindings(file);
+    const cur = f.filter(x => x.rule === 'hardcoded-currency').map(x => x.from);
+    for (const c of ['250 KWD', '50 QAR', '10 BHD', '30 OMR', '199 EGP'])
+      assert.ok(cur.includes(c), `${c} must be flagged as hardcoded currency`);
+    assert.ok(!cur.some(x => /try/i.test(x)), 'lowercase "try" is the English verb, not the TRY lira → no false positive');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
 test('exit codes: default/--check gate on error (0); --strict fails on warnings; --report-only never fails', () => {
   const input = CASE('fp-brand-proper-noun'); // has warnings, zero errors
   const run = (extra) => {
