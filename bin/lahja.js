@@ -121,7 +121,11 @@ function main() {
   if (doCatalog) {
     const { checkCatalog } = require('../lib/catalog-core');
     const res = checkCatalog(target, { base: baseLocale });
-    if (res.error) { console.error(`lahja --catalog: ${res.error}`); process.exit(2); }
+    if (res.error) {
+      if (asJson) console.log(JSON.stringify({ version: VERSION, error: res.error }));
+      else console.error(`lahja --catalog: ${res.error}`);
+      process.exit(2);
+    }
     if (asJson) {
       console.log(JSON.stringify(res, null, 2));
     } else {
