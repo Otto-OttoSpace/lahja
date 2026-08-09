@@ -147,3 +147,27 @@ test('catalog: a UTF-8 BOM on the base file does not abort the run', () => {
     assert.strictEqual(res.base, 'en');
   } finally { fs.rmSync(d, { recursive: true, force: true }); }
 });
+
+// ── regression: a legit "__error" catalog key must not abort the run ─────────
+test('catalog: a real "__error" key is diffed, not treated as a parse failure', () => {
+  const d = setup({
+    'en.json': { __error: 'Something went wrong', ok: 'OK' },
+    'ar.json': { __error: 'خطأ', ok: 'موافق' },
+  });
+  try {
+    const res = runJson(d);
+    assert.ok(!res.error, 'a data-space __error key must not abort the check');
+    assert.strictEqual(res.base, 'en');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: --json emits a JSON error envelope on a real parse failure', () => {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'lahja-perr-'));
+  fs.writeFileSync(path.join(d, 'en.json'), 'not json{');
+  fs.writeFileSync(path.join(d, 'ar.json'), JSON.stringify({ a: '1' }));
+  try {
+    // runJson recovers stdout on the non-zero exit — it must still be valid JSON.
+    const res = runJson(d);
+    assert.ok(res.error && /base en/.test(res.error), 'error is reported inside the JSON envelope');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
