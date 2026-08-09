@@ -139,7 +139,8 @@ function main() {
 
   if (initRules) {
     const dest = path.join(target, 'I18N-RULES.md');
-    fs.writeFileSync(dest, RULES_DOC);
+    try { fs.mkdirSync(target, { recursive: true }); fs.writeFileSync(dest, RULES_DOC); }
+    catch { console.error(`lahja --init-rules: cannot write to ${target}`); process.exit(2); }
     console.log(`✓ wrote ${dest} — point Cursor/Claude at it so they stop hardcoding strings.`);
     return;
   }
