@@ -86,3 +86,64 @@ test('catalog: ignores non-locale JSON (package.json etc.)', () => {
     assert.ok(!res.results.some(r => r.locale === 'package'), 'package.json must not be treated as a locale');
   } finally { fs.rmSync(d, { recursive: true, force: true }); }
 });
+
+// ── regression: ICU select must NOT be checked as a cardinal plural ──────────
+test('catalog: valid select/gender is not reported as an incomplete plural', () => {
+  const d = setup({
+    'en.json': { who: '{gender, select, male {He replied} female {She replied} other {They replied}}' },
+    'ar.json': { who: '{gender, select, male {هو رد} female {هي ردت} other {هم ردوا}}' },
+  });
+  try {
+    const ar = rulesFor(runJson(d), 'ar');
+    assert.ok(!ar.has('icu-plural-incomplete'), 'a select must not demand cardinal plural categories');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: a genuine plural gap is still flagged (select fix did not over-relax)', () => {
+  const d = setup({
+    'en.json': { cart: '{count, plural, one {# item} other {# items}}' },
+    'ar.json': { cart: '{count, plural, other {# عنصر}}' },
+  });
+  try {
+    assert.ok(rulesFor(runJson(d), 'ar').has('icu-plural-incomplete'), 'ar still needs zero/one/two/few/many');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: top-level keys named like Object.prototype members are diffed', () => {
+  const d = setup({
+    'en.json': { toString: 'Convert', constructor: 'Builder', greeting: 'Hi' },
+    'ar.json': { greeting: 'مرحبا' },
+  });
+  try {
+    const ar = runJson(d).results.find(x => x.locale === 'ar').findings.map(f => f.key);
+    assert.ok(ar.includes('toString') && ar.includes('constructor'), 'dropped prototype-named keys must be reported');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: a whitespace-only translation is empty-value', () => {
+  const d = setup({ 'en.json': { save: 'Save', ok: 'OK' }, 'ar.json': { save: '   ', ok: '\t' } });
+  try {
+    assert.ok(rulesFor(runJson(d), 'ar').has('empty-value'), 'blank/whitespace value is untranslated');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: i18next CLDR plural siblings are not extra-key', () => {
+  const d = setup({
+    'en.json': { item_one: '1 item', item_other: '{{count}} items' },
+    'ar.json': { item_zero: '0', item_one: '1', item_two: '2', item_few: '3', item_many: '4', item_other: '{{count}}' },
+  });
+  try {
+    assert.ok(!rulesFor(runJson(d), 'ar').has('extra-key'), 'ar plural forms EN lacks are required, not extra');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: a UTF-8 BOM on the base file does not abort the run', () => {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'lahja-bom-'));
+  fs.writeFileSync(path.join(d, 'en.json'), '﻿' + JSON.stringify({ hello: 'Hello' }));
+  fs.writeFileSync(path.join(d, 'ar.json'), JSON.stringify({ hello: 'مرحبا' }));
+  try {
+    const res = runJson(d);
+    assert.ok(!res.error, 'BOM must be stripped, not treated as a parse error');
+    assert.strictEqual(res.base, 'en');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
