@@ -25,7 +25,9 @@ function loadIgnorePatterns(cwd) {
   const p = path.join(cwd, IGNORE_FILE);
   let raw; try { raw = fs.readFileSync(p, 'utf8'); } catch { return []; }
   return raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'))
-    .map(g => new RegExp(g.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')));
+    // A .lahjaignore glob is untrusted: cap its length and collapse adjacent
+    // `.*` so a line like `**********Z` can't cause catastrophic backtracking.
+    .map(g => new RegExp(g.slice(0, 200).replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/(?:\.\*)+/g, '.*')));
 }
 function ignored(rel, patterns) { return patterns.some(re => re.test(rel)); }
 

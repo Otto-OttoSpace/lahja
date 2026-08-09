@@ -26,8 +26,21 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: { code: { type: 'string' }, ext: { type: 'string', description: 'e.g. .tsx (default), .vue, .svelte, .html' } }, required: ['code'] } }
 ];
 
+// A caller-supplied scan `path` must not be readable as a flag/subcommand
+// (`--init-rules`, `--catalog`, …) that would hijack the CLI. Reject leading-dash
+// and prefix a bare relative path with `./` so it can only be a path.
+function safeScanPath(p) {
+  if (typeof p !== 'string' || !p || p.startsWith('-')) return null;
+  if (!path.isAbsolute(p) && !p.startsWith('./') && !p.startsWith('../')) return './' + p;
+  return p;
+}
+
 function callTool(name, args) {
-  if (name === 'lahja_scan') return runCli([args.path, '--json']);
+  if (name === 'lahja_scan') {
+    const p = safeScanPath(args.path);
+    if (!p) throw new Error('invalid path (must be a file/dir, not a flag or subcommand)');
+    return runCli([p, '--json']);
+  }
   if (name === 'lahja_check_code') {
     // `ext` is attacker-controlled and gets joined into a temp path, so accept
     // only a leading dot followed by alphanumerics (no '/', '\\', '..' or other
