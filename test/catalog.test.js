@@ -271,3 +271,31 @@ test('catalog: a value that merely equals a key name is NOT a duplicate key', ()
     assert.ok(!res.results.some(r => r.findings.some(f => f.rule === 'duplicate-key')), 'a string value equal to a key name must not be flagged');
   } finally { fs.rmSync(d, { recursive: true, force: true }); }
 });
+
+test('catalog: ICU plural completeness handles space-less arms (no false "missing")', () => {
+  // Mastodon/react-intl write arms without spaces: `zero{}one{…}` — the category
+  // detector must still see every arm. (B2)
+  const d = setupRaw({
+    'en.json': '{"n":"{count,plural,one{# item}other{# items}}"}',
+    'ar.json': '{"n":"{count,plural,zero{}one{#}two{#}few{#}many{#}other{#}}"}',
+  });
+  try {
+    const ar = runJson(d).results.find(x => x.locale === 'ar');
+    assert.ok(!ar.findings.some(f => f.rule === 'icu-plural-incomplete'),
+      'a complete space-less Arabic plural must not be reported incomplete');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: an ICU arm-local literal is NOT placeholder-drift (only cross-arm drops are)', () => {
+  const d = setupRaw({
+    'en.json': '{"n":"{count,plural,one{# item}other{# items}}"}',
+    // Arabic legitimately restructures arms and adds its own {عدد} literal in one
+    // arm — that is not a dropped/extra placeholder bug.
+    'ar.json': '{"n":"{count,plural,zero{}one{عنصر واحد}two{عنصران}few{# عناصر}many{# عنصرا}other{{count} عنصر}}"}',
+  });
+  try {
+    const ar = runJson(d).results.find(x => x.locale === 'ar');
+    assert.ok(!ar.findings.some(f => f.rule === 'placeholder-drift'),
+      'arm-local ICU tokens must not read as placeholder drift');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
