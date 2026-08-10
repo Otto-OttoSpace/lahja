@@ -227,3 +227,47 @@ test('catalog: --base pointing at a missing locale errors (not silent fallback)'
     assert.ok(res.error && /base "zz" not found/.test(res.error), 'unknown --base is an error');
   } finally { fs.rmSync(d, { recursive: true, force: true }); }
 });
+
+// A repeated key can only exist in RAW text — JSON.stringify(object) can't emit
+// one — so these write the file bytes directly.
+const setupRaw = files => {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'lahja-cat-'));
+  for (const [name, text] of Object.entries(files)) fs.writeFileSync(path.join(d, name), text);
+  return d;
+};
+
+test('catalog: a duplicate key in a locale file is flagged (JSON.parse silently hides it)', () => {
+  const d = setupRaw({
+    'en.json': JSON.stringify({ save: 'Save', cancel: 'Cancel' }),
+    'fr.json': '{\n  "save": "Enregistrer",\n  "cancel": "Annuler",\n  "save": "Sauvegarder"\n}\n',
+  });
+  try {
+    const res = runJson(d);
+    assert.ok(rulesFor(res, 'fr').has('duplicate-key'), 'the repeated "save" key must be flagged');
+    const dup = res.results.find(x => x.locale === 'fr').findings.find(f => f.rule === 'duplicate-key');
+    assert.strictEqual(dup.key, 'save');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: a duplicate key in the BASE file surfaces the base in results', () => {
+  const d = setupRaw({
+    'en.json': '{\n  "a": "1",\n  "b": "2",\n  "a": "3"\n}\n',
+    'ar.json': JSON.stringify({ a: '١', b: '٢' }),
+  });
+  try {
+    const res = runJson(d);
+    const en = res.results.find(x => x.locale === 'en');
+    assert.ok(en && en.findings.some(f => f.rule === 'duplicate-key' && f.key === 'a'), 'the base dup key must appear');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: a value that merely equals a key name is NOT a duplicate key', () => {
+  const d = setupRaw({
+    'en.json': JSON.stringify({ title: 'title', name: 'title' }),
+    'ar.json': JSON.stringify({ title: 'عنوان', name: 'الاسم' }),
+  });
+  try {
+    const res = runJson(d);
+    assert.ok(!res.results.some(r => r.findings.some(f => f.rule === 'duplicate-key')), 'a string value equal to a key name must not be flagged');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
