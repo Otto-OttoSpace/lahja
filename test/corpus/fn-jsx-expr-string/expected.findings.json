@@ -1,0 +1,12 @@
+[
+  {
+    "rule": "hardcoded-text",
+    "line": 3,
+    "from": "مرحبا بالعالم هنا"
+  },
+  {
+    "rule": "hardcoded-text",
+    "line": 4,
+    "from": "Save changes"
+  }
+]
