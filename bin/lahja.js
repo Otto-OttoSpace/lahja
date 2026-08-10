@@ -120,6 +120,18 @@ function main() {
   const baseLocale = baseIdx !== -1 ? args[baseIdx + 1] : null;
   const target = args.find((a, i) => !a.startsWith('-') && (baseIdx === -1 || i !== baseIdx + 1)) || '.';
 
+  // Fail loudly on an unknown/mistyped flag — a silent typo like `--strct`
+  // would otherwise drop the intended `--strict` gate and let CI pass green.
+  const KNOWN_FLAGS = new Set(['--help', '-h', '--version', '-v', '--json', '--check',
+    '--strict', '--report-only', '--suggest', '--baseline', '--update-baseline',
+    '--init-rules', '--catalog', '--base']);
+  for (const a of args) {
+    if (a.startsWith('-') && !KNOWN_FLAGS.has(a)) {
+      console.error(`lahja: unknown option ${a} (see --help)`);
+      process.exit(2);
+    }
+  }
+
   if (doCatalog) {
     const { checkCatalog } = require('../lib/catalog-core');
     const res = checkCatalog(target, { base: baseLocale });

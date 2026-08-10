@@ -205,3 +205,25 @@ test('catalog: recognizes $t()/%(name)s/<0>/hyphenated placeholder families', ()
     for (const k of ['nest', 'py', 'trans', 'hyph']) assert.ok(keys.includes(k), `${k} placeholder drift detected`);
   } finally { fs.rmSync(d, { recursive: true, force: true }); }
 });
+
+// ── DX safety ────────────────────────────────────────────────────────────────
+test('cli: an unknown/mistyped flag fails loudly (no silent CI false-green)', () => {
+  const d = setup({ 'en.json': { a: 'A' }, 'ar.json': { a: 'ا' } });
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lahja-flag-'));
+  fs.writeFileSync(path.join(tmp, 'x.jsx'), 'export const A = () => <div>Add to cart</div>;');
+  try {
+    let code = 0, err = '';
+    try { execFileSync(process.execPath, [CLI, tmp, '--strct'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }); }
+    catch (e) { code = e.status; err = e.stderr || ''; }
+    assert.strictEqual(code, 2, 'a mistyped flag must exit non-zero');
+    assert.match(err, /unknown option --strct/);
+  } finally { fs.rmSync(d, { recursive: true, force: true }); fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('catalog: --base pointing at a missing locale errors (not silent fallback)', () => {
+  const d = setup({ 'en.json': { a: 'A' }, 'ar.json': { a: 'ا' } });
+  try {
+    const res = runJson(d, ['--base', 'zz']);
+    assert.ok(res.error && /base "zz" not found/.test(res.error), 'unknown --base is an error');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
