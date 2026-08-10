@@ -1,7 +1,7 @@
 {
   "name": "lahja",
-  "version": "0.5.1",
-  "description": "Find the user-facing strings AI code tools hardcode instead of translating \u2014 AST-verified so it never flags live code or dynamic bindings. CLI + MCP + AI-rules. Part of OttoSpace.",
+  "version": "0.6.0",
+  "description": "Find the user-facing strings AI code tools hardcode instead of translating — AST-verified so it never flags live code or dynamic bindings. CLI + MCP + AI-rules. Part of OttoSpace.",
   "bin": {
     "lahja": "bin/lahja.js",
     "i18nlint": "bin/lahja.js",
