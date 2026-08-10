@@ -171,3 +171,37 @@ test('catalog: --json emits a JSON error envelope on a real parse failure', () =
     assert.ok(res.error && /base en/.test(res.error), 'error is reported inside the JSON envelope');
   } finally { fs.rmSync(d, { recursive: true, force: true }); }
 });
+
+// ── catalog FN extensions ────────────────────────────────────────────────────
+test('catalog: flags type mismatches (string→number/bool, non-empty array→empty)', () => {
+  const d = setup({
+    'en.json': { count: '5 apples', flag: 'Enabled', steps: ['First', 'Second'] },
+    'ar.json': { count: 5, flag: true, steps: [] },
+  });
+  try {
+    const ar = rulesFor(runJson(d), 'ar');
+    assert.ok(ar.has('type-mismatch'), 'string→number/bool is a type mismatch');
+    assert.ok(ar.has('empty-value'), 'a non-empty array translated as [] is empty');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: a plural arm that drops an inner {name} is placeholder-drift', () => {
+  const d = setup({
+    'en.json': { cart: '{count, plural, one {Hi {name}, # item} other {Hi {name}, # items}}' },
+    'de.json': { cart: '{count, plural, one {# Artikel} other {# Artikel}}' },
+  });
+  try {
+    assert.ok(rulesFor(runJson(d), 'de').has('placeholder-drift'), 'dropped {name} inside plural arms');
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
+
+test('catalog: recognizes $t()/%(name)s/<0>/hyphenated placeholder families', () => {
+  const d = setup({
+    'en.json': { nest: 'Welcome $t(appName)', py: 'Hi %(name)s', trans: 'Read <0>terms</0>', hyph: 'Order {order-id}' },
+    'ar.json': { nest: 'مرحبا', py: 'مرحبا', trans: 'اقرأ', hyph: 'طلب' },
+  });
+  try {
+    const keys = runJson(d).results.find(x => x.locale === 'ar').findings.filter(f => f.rule === 'placeholder-drift').map(f => f.key);
+    for (const k of ['nest', 'py', 'trans', 'hyph']) assert.ok(keys.includes(k), `${k} placeholder drift detected`);
+  } finally { fs.rmSync(d, { recursive: true, force: true }); }
+});
